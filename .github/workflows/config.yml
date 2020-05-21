@@ -39,7 +39,12 @@ jobs:
           mv README.md rocktee-${{ matrix.target }}/
           tar cvfJ rocktee-${{ matrix.target }}.tar.xz \
                       rocktee-${{ matrix.target }}
-
+      - name: Upload file
+        uses: actions/upload-artifact@v1
+        with:
+          name: builds
+          path: rocktee-${{ matrix.target }}.tar.xz
+      
   release_source_codes:
     name: Release source codes
     runs-on: ubuntu-latest  
@@ -58,7 +63,7 @@ jobs:
           prerelease: false
   
   release_builds:
-    name: Release source codes and binnary builds
+    name: Release binnary builds
     needs: [build_on_linux, release_source_codes]
     runs-on: ubuntu-latest
     strategy:
@@ -70,6 +75,10 @@ jobs:
                   aarch64-linux-android
                   ]
     steps:
+      - name: Download builds from job build_on_linux
+        uses: actions/download-artifact@v1
+        with:
+          name: builds
       - name: Upload Release Asset
         id: upload-release-asset 
         uses: actions/upload-release-asset@v1
@@ -77,6 +86,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.release_source_codes.outputs.upload_url }} 
-          asset_path: rocktee-${{ matrix.target }}.tar.xz
+          asset_path: builds/rocktee-${{ matrix.target }}.tar.xz
           asset_name: rocktee-${{ matrix.target }}.tar.xz
           asset_content_type: application/zip
