@@ -10,27 +10,29 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-
+    strategy:
+    matrix:
+      target: [x86_64-unknown-linux-musl, x86_64-pc-windows-gnu]
     steps:
     - uses: actions/checkout@v2
     - uses: actions-rs/toolchain@v1
       with:
         toolchain: stable
-        target: x86_64-unknown-linux-musl
+        target: ${{ matrix.target }}
         override: true
     - uses: actions-rs/cargo@v1
       with:
         use-cross: true
         command: build
-        args: --release --target x86_64-unknown-linux-musl
+        args: --release --target ${{ matrix.target }}
     - name: Create binnary package 
       run: |
-        mkdir rocktee-x86_64-unknown-linux-musl
-        mv target/x86_64-unknown-linux-musl/release/rocktee rocktee-x86_64-unknown-linux-musl/
-        mv LICENSE rocktee-x86_64-unknown-linux-musl/
-        mv README.md rocktee-x86_64-unknown-linux-musl/
-        tar cvfJ rocktee-x86_64-unknown-linux-musl.tar.xz \
-                    rocktee-x86_64-unknown-linux-musl
+        mkdir rocktee-${{ matrix.target }}
+        mv target/${{ matrix.target }}/release/rocktee rocktee-${{ matrix.target }}/
+        mv LICENSE rocktee-${{ matrix.target }}/
+        mv README.md rocktee-${{ matrix.target }}/
+        tar cvfJ rocktee-${{ matrix.target }}.tar.xz \
+                    rocktee-${{ matrix.target }}
 
     - name: Create Release
       id: create_release
@@ -49,6 +51,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }} 
-        asset_path: rocktee-x86_64-unknown-linux-musl.tar.xz
-        asset_name: rocktee-x86_64-unknown-linux-musl.tar.xz
+        asset_path: rocktee-${{ matrix.target }}.tar.xz
+        asset_name: rocktee-${{ matrix.target }}.tar.xz
         asset_content_type: application/zip
