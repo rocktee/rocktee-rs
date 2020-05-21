@@ -12,7 +12,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        target: [x86_64-unknown-linux-musl, x86_64-pc-windows-gnu]
+        target: [ x86_64-unknown-linux-musl, \
+                  x86_64-pc-windows-gnu, \
+                  aarch64-unknown-linux-musl, \
+                  armv7-unknown-linux-musleabihf, \
+                  aarch64-linux-android
+                  ]
     steps:
     - uses: actions/checkout@v2
     - uses: actions-rs/toolchain@v1
@@ -28,7 +33,7 @@ jobs:
     - name: Create binnary package 
       run: |
         mkdir rocktee-${{ matrix.target }}
-        mv target/${{ matrix.target }}/release/rocktee rocktee-${{ matrix.target }}/
+        mv target/${{ matrix.target }}/release/rocktee* rocktee-${{ matrix.target }}/
         mv LICENSE rocktee-${{ matrix.target }}/
         mv README.md rocktee-${{ matrix.target }}/
         tar cvfJ rocktee-${{ matrix.target }}.tar.xz \
