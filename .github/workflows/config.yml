@@ -25,9 +25,12 @@ jobs:
         args: --release --target x86_64-unknown-linux-musl
     - name: Create binnary package 
       run: |
-        tar cvfJ rocktee-x86_64-unknown-linux-musl.tar.xz LICENSE \
-                    README.md \
-                    target/x86_64-unknown-linux-musl/release/rocktee
+        mkdir rocktee-x86_64-unknown-linux-musl
+        mv target/x86_64-unknown-linux-musl/release/rocktee rocktee-x86_64-unknown-linux-musl/
+        mv LICENSE rocktee-x86_64-unknown-linux-musl/
+        mv README.md rocktee-x86_64-unknown-linux-musl/
+        tar cvfJ rocktee-x86_64-unknown-linux-musl.tar.xz \
+                    rocktee-x86_64-unknown-linux-musl
 
     - name: Create Release
       id: create_release
