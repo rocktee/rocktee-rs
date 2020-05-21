@@ -1,3 +1,3 @@
-# rocktee-rs
+# rocktee
 
 
