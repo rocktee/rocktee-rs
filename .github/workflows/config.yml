@@ -62,9 +62,36 @@ jobs:
           draft: false
           prerelease: false
   
+  build_on_macos:
+    name: Compile and Build on MacOS 
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - uses: actions-rs/cargo@v1
+        with:
+          use-cross: true
+          command: build
+          args: --release ##--all-features
+      - name: Create binnary package 
+        run: |
+          mkdir rocktee-macos-latest
+          mv target/release/rocktee* rocktee-macos-latest/
+          mv LICENSE rocktee-macos-latest/
+          mv README.md rocktee-macos-latest/
+          tar cvfJ rocktee-macos-latest.tar.xz \
+                      rocktee-macos-latest
+      - name: Upload file
+        uses: actions/upload-artifact@v1
+        with:
+          name: builds
+          path: rocktee-macos-latest.tar.xz
+
   release_builds:
     name: Release binnary builds
-    needs: [build_on_linux, release_source_codes]
+    needs: [build_on_linux, build_on_macos, release_source_codes]
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -72,7 +99,8 @@ jobs:
                   x86_64-pc-windows-gnu,
                   aarch64-unknown-linux-musl,
                   armv7-unknown-linux-musleabihf, 
-                  aarch64-linux-android
+                  aarch64-linux-android,
+                  macos-latest
                   ]
     steps:
       - name: Download builds from job build_on_linux
