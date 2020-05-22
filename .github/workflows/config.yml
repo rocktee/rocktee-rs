@@ -77,33 +77,63 @@ jobs:
           args: --release ##--all-features
       - name: Create binnary package 
         run: |
-          mkdir rocktee-macos-latest
+          mkdir rocktee-x86_64-macos-latest
           mv target/release/rocktee* rocktee-macos-latest/
           mv LICENSE rocktee-macos-latest/
           mv README.md rocktee-macos-latest/
-          tar cvfJ rocktee-macos-latest.tar.xz \
-                      rocktee-macos-latest
+          # tar cvfJ rocktee-macos-latest.tar.xz \
+          #             rocktee-x86_64-macos-latest
+          zip -r rocktee-x86_64-macos-latest.zip rocktee-x86_64-macos-latest
       - name: Upload file
         uses: actions/upload-artifact@v1
         with:
           name: builds
-          path: rocktee-macos-latest.tar.xz
+          path: rocktee-macos-latest.zip
+  
+  build_on_windows:
+    name: Compile and Build on Windows 
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - uses: actions-rs/cargo@v1
+        with:
+          use-cross: true
+          command: build
+          args: --release ##--all-features
+      - name: Create binnary package 
+        run: |
+          mkdir rocktee-x86_64-windows-latest
+          mv target/release/rocktee* rocktee-windows-latest/
+          mv LICENSE rocktee-x86_64-windows-latest/
+          mv README.md rocktee-x86_64-windows-latest/
+          # tar cvfJ rocktee-x86_64-windows-latest.tar.xz \
+          #             rocktee-x86_64-windows-latest
+          zip -r rocktee-x86_64-windows-latest.zip rocktee-x86_64-windows-latest
+      - name: Upload file
+        uses: actions/upload-artifact@v1
+        with:
+          name: builds
+          path: rocktee-x86_64-windows-latest.zip
 
   release_builds:
     name: Release binnary builds
-    needs: [build_on_linux, build_on_macos, release_source_codes]
+    needs: [build_on_linux, build_on_macos, build_on_windows, release_source_codes]
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        target: [ x86_64-unknown-linux-musl,
-                  x86_64-pc-windows-gnu,
-                  aarch64-unknown-linux-musl,
-                  armv7-unknown-linux-musleabihf, 
-                  aarch64-linux-android,
-                  macos-latest
+        target: [ x86_64-unknown-linux-musl.tar.xz,
+                  x86_64-pc-windows-gnu.tar.xz,
+                  aarch64-unknown-linux-musl.tar.xz,
+                  armv7-unknown-linux-musleabihf.tar.xz, 
+                  aarch64-linux-android.tar.xz,
+                  x86_64-windows-latest.zip,
+                  x86_64-macos-latest.zip
                   ]
     steps:
-      - name: Download builds from job build_on_linux
+      - name: Download builds from build jobs
         uses: actions/download-artifact@v1
         with:
           name: builds
@@ -114,6 +144,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.release_source_codes.outputs.upload_url }} 
-          asset_path: builds/rocktee-${{ matrix.target }}.tar.xz
-          asset_name: rocktee-${{ matrix.target }}.tar.xz
+          asset_path: builds/rocktee-${{ matrix.target }}
+          asset_name: rocktee-${{ matrix.target }}
           asset_content_type: application/zip
