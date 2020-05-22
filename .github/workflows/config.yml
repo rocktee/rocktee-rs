@@ -78,17 +78,17 @@ jobs:
       - name: Create binnary package 
         run: |
           mkdir rocktee-x86_64-macos-latest
-          mv target/release/rocktee* rocktee-macos-latest/
-          mv LICENSE rocktee-macos-latest/
-          mv README.md rocktee-macos-latest/
-          # tar cvfJ rocktee-macos-latest.tar.xz \
+          mv target/release/rocktee* rocktee-x86_64-macos-latest/
+          mv LICENSE rocktee-x86_64-macos-latest/
+          mv README.md rocktee-x86_64-macos-latest/
+          # tar cvfJ rocktee-x86_64-macos-latest.tar.xz \
           #             rocktee-x86_64-macos-latest
           zip -r rocktee-x86_64-macos-latest.zip rocktee-x86_64-macos-latest
       - name: Upload file
         uses: actions/upload-artifact@v1
         with:
           name: builds
-          path: rocktee-macos-latest.zip
+          path: rocktee-x86_64-macos-latest.zip
   
   build_on_windows:
     name: Compile and Build on Windows 
@@ -106,7 +106,7 @@ jobs:
       - name: Create binnary package 
         run: |
           mkdir rocktee-x86_64-windows-latest
-          mv target/release/rocktee* rocktee-windows-latest/
+          mv target/release/rocktee* rocktee-x86_64-windows-latest/
           mv LICENSE rocktee-x86_64-windows-latest/
           mv README.md rocktee-x86_64-windows-latest/
           # tar cvfJ rocktee-x86_64-windows-latest.tar.xz \
