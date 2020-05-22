@@ -111,7 +111,7 @@ jobs:
           mv README.md rocktee-x86_64-windows-latest/
           # tar cvfJ rocktee-x86_64-windows-latest.tar.xz \
           #             rocktee-x86_64-windows-latest
-          zip -r rocktee-x86_64-windows-latest.zip rocktee-x86_64-windows-latest
+          Compress-Archive -Path rocktee-x86_64-windows-latest -DestinationPath rocktee-x86_64-windows-latest.zip
       - name: Upload file
         uses: actions/upload-artifact@v1
         with:
